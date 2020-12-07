@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 )
 
@@ -24,12 +23,12 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list all host",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("	%-36s	%-20s	%-20s\n", "ID", "NAME", "HOST")
-		fmt.Printf("%s\n\n","	============================================================================")
-		for _, value := range ssh.Node{
-			fmt.Printf("	%-36s	%-20s	%-20s\n", value.Id, value.Name, value.Host)
+		cmd.Printf("	%-36s	%-20s	%-20s\n", "ID", "NAME", "HOST")
+		cmd.Printf("%s\n\n", "	============================================================================")
+		for _, value := range ssh.Node {
+			cmd.Printf("	%-36s	%-20s	%-20s\n", value.Id, value.Name, value.Host)
 		}
 	},
 }

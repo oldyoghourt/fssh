@@ -36,9 +36,9 @@ var addCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		var n Node
 		n.Id, _ = uuid.GenerateUUID()
-		fmt.Print("Please input Name: ")
+		cmd.Print("Please input Name: ")
 		_, _ = fmt.Scanln(&n.Name)
-		fmt.Print("Please input User: ")
+		cmd.Print("Please input User: ")
 		_, _ = fmt.Scanln(&n.User)
 		//fmt.Print("Please input Passwd: ")
 		//_, _ = fmt.Scanln(&n.Passwd)
@@ -47,13 +47,13 @@ var addCmd = &cobra.Command{
 		//	fmt.Println(err.Error())
 		//}
 		//n.Passwd = string(aes)
-		fmt.Print("Please input Host: ")
+		cmd.Print("Please input Host: ")
 		_, _ = fmt.Scanln(&n.Host)
 		ssh.Node = append(ssh.Node, n)
 		viper.Set("node", ssh.Node)
 		err := viper.SafeWriteConfig()
-		if err != nil{
-			if strings.Contains(err.Error(), "Already Exists"){
+		if err != nil {
+			if strings.Contains(err.Error(), "Already Exists") {
 				_ = viper.WriteConfig()
 			}
 		}

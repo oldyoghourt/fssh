@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"
+	"regexp"
+	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -29,26 +31,25 @@ type SSH struct {
 }
 
 type Node struct {
-	Id string
-	Name string
-	User string
+	Id     string
+	Name   string
+	User   string
 	Passwd string
-	Host string
+	Host   string
 }
 
 var cfgFile string
 var ssh SSH
-var secret = "fsshsecr87654321"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "fssh",
 	Short: "fast login ssh",
-	Long: ``,
+	Long:  ``,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(`Use "fssh [command] --help" for more information about a command.`)
+		_ = cmd.Help()
 	},
 }
 
@@ -98,9 +99,39 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		err := viper.Unmarshal(&ssh)
-		if err != nil{
+		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
 	}
+}
+
+// search the node, return the index and Node
+func SelectNode(args []string, f func([]string) (int, Node)) (int, Node) {
+	var choiceNode Node
+	i := -1
+	if len(args) == 0 {
+		return i, choiceNode
+	}
+	if nil != f {
+		return f(args)
+	}
+
+	for index, s := range ssh.Node {
+		if s.Id == args[0] || strings.HasPrefix(s.Id, args[0]) || s.Name == args[0] {
+			choiceNode = s
+			i = index
+			break
+		}
+
+		compile, err := regexp.Compile(`(\d+\.){3}\d+`)
+		if err == nil {
+			if compile.MatchString(args[0]) && s.Host == args[0] {
+				choiceNode = s
+				i = index
+				break
+			}
+		}
+	}
+	return i, choiceNode
 }

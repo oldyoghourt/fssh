@@ -19,44 +19,31 @@ import (
 	"fmt"
 	"fssh/util"
 	"github.com/spf13/cobra"
-	"regexp"
-	"strings"
 )
 
 // loginCmd represents the login command
 var loginCmd = &cobra.Command{
-	Use:   "login",
-	Short: "login ssh",
-	Long: ``,
+	Use:     "login",
+	Short:   "login ssh",
+	Long:    ``,
 	Aliases: []string{"l"},
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 1 {
 
-			var currentNode Node
-			for _, s := range ssh.Node {
-				if s.Id == args[0] || strings.HasPrefix(s.Id, args[0]) || s.Name == args[0]{
-					currentNode = s
-					break
-				}
-
-				compile, err := regexp.Compile(`(\d+\.){3}\d+`)
-				if err == nil{
-					if compile.MatchString(args[0]){
-						currentNode = s
-						break
+			index, currentNode := SelectNode(args, nil)
+			if index < 0 {
+				cmd.Println("invalid argument")
+			} else {
+				if currentNode.Host != "" {
+					if currentNode.Name != "" {
+						util.RunCommand("ssh", fmt.Sprintf("%s@%s", currentNode.User, currentNode.Host))
+					} else {
+						util.RunCommand("ssh", currentNode.Host)
 					}
 				}
 			}
-
-			if currentNode.Host != ""{
-				if currentNode.Name != ""{
-					util.RunCommand("ssh", fmt.Sprintf("%s@%s", currentNode.User, currentNode.Host))
-				}else{
-					util.RunCommand("ssh", currentNode.Host)
-				}
-			}
 		} else {
-			fmt.Println("invalid argument")
+			cmd.Println("invalid argument")
 		}
 	},
 }
