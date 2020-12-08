@@ -26,7 +26,7 @@ import (
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "add host info",
+	Short: "add a host config node",
 	Long: `
 	HOST INFO:
 	-	Name		node name
